@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แบบทดสอบ กปน. เขตพญาไท</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #f3f0ff;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .highlight-box {
+            animation: pulse-border 2s infinite;
+        }
+        @keyframes pulse-border {
+            0% { border-color: #a855f7; box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.4); }
+            70% { border-color: #d8b4fe; box-shadow: 0 0 0 6px rgba(168, 85, 247, 0); }
+            100% { border-color: #a855f7; box-shadow: 0 0 0 0 rgba(168, 85, 247, 0); }
+        }
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #a855f7;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="text-gray-800 antialiased p-4 md:p-8">
+
+    <div class="max-w-3xl mx-auto glass-panel rounded-2xl overflow-hidden relative border border-purple-100">
+        
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-purple-700 to-purple-500 p-6 text-white text-center relative">
+            <button onclick="checkAdmin()" class="absolute top-4 right-4 text-purple-200 hover:text-white transition" title="สำหรับผู้ดูแลระบบ">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+            </button>
+
+            <div class="flex justify-center mb-3">
+                <img src="Logo.png" alt="Logo" class="h-16 w-auto object-contain" onerror="this.outerHTML='<div class=\'h-16 w-16 bg-white rounded-full flex items-center justify-center text-purple-600 font-bold text-xl mx-auto shadow-md\'>กปน.</div>'">
+            </div>
+            
+            <h1 class="text-2xl md:text-3xl font-bold tracking-wide">แบบทดสอบ กปน. เขตพญาไท</h1>
+            <p class="text-purple-100 mt-2 text-sm md:text-base">ระบบทดสอบความรู้คณะกรรมการประจำหน่วยเลือกตั้ง</p>
+            
+            <!-- Global Loading Indicator -->
+            <div id="globalLoading" class="absolute top-4 left-4 flex items-center bg-purple-800 bg-opacity-50 px-3 py-1 rounded-full text-xs hidden">
+                <div class="loader mr-2 !w-4 !h-4 !border-2"></div> กำลังเชื่อมต่อฐานข้อมูล...
+            </div>
+        </div>
+
+        <div class="p-6 md:p-8">
+            <div id="alertBox" class="hidden mb-6 p-4 rounded-lg text-sm font-medium transition-all"></div>
+
+            <!-- Pre-Test Section (User Info) -->
+            <div id="preTestSection" class="space-y-5">
+                <h2 class="text-lg font-semibold text-purple-800 border-b-2 border-purple-200 pb-2 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                    ข้อมูลผู้ตอบแบบทดสอบ
+                </h2>
+
+                <div class="grid grid-cols-1 gap-5">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">ชื่อ - สกุล <span class="text-gray-500 text-xs font-normal ml-1">(ไม่ต้องใส่คำนำหน้าชื่อ)</span> <span class="text-red-500">*</span></label>
+                        <input type="text" id="fullName" onblur="checkUserScore()" placeholder="เช่น สมชาย ใจดี" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-colors">
+                        
+                        <div id="loadingScore" class="hidden mt-2 text-xs text-gray-500 flex items-center">
+                            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                            กำลังตรวจสอบประวัติ...
+                        </div>
+                        <div id="scoreDisplay" class="hidden mt-3 p-3 rounded-lg text-sm transition-all">
+                            <p id="scoreText"></p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">แขวง <span class="text-red-500">*</span></label>
+                            <select id="subDistrict" onchange="updateUnits()" class="w-full border border-gray-300 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-purple-500 bg-white">
+                                <option value="">-- เลือกแขวง --</option>
+                                <option value="สามเสนใน">สามเสนใน</option>
+                                <option value="พญาไท">พญาไท</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">หน่วยเลือกตั้งที่ <span class="text-red-500">*</span></label>
+                            <select id="unitNumber" onchange="updateLocation()" disabled class="w-full border border-gray-300 rounded-lg px-4 py-2.5 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-purple-500">
+                                <option value="">-- กรุณาเลือกแขวงก่อน --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">สถานที่ตั้งหน่วยเลือกตั้ง</label>
+                        <div id="locationDisplay" class="w-full border border-gray-200 bg-gray-100 rounded-lg px-4 py-3 text-gray-600 min-h-[46px] text-sm md:text-base">
+                            (สถานที่ตั้งหน่วยจะแสดงอัตโนมัติ)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-4">
+                    <button id="startBtn" onclick="startTest()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5">
+                        เริ่มทำแบบทดสอบ
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quiz Section (Hidden initially) -->
+            <div id="quizSection" class="hidden space-y-6">
+                
+                <div class="bg-white border-2 border-purple-500 rounded-xl p-5 highlight-box shadow-sm relative">
+                    <div class="absolute -top-3 left-4 bg-white px-2 text-purple-600 font-semibold text-sm">เลือกวันที่ต้องการทดสอบ</div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2 flex items-center">
+                        ข้อสอบประจำวันที่:
+                    </label>
+                    <select id="testDate" onchange="loadQuestionsForDate()" class="w-full border-2 border-purple-200 rounded-lg px-4 py-3 focus:outline-none focus:ring-0 focus:border-purple-600 bg-purple-50 text-purple-900 font-medium text-lg cursor-pointer">
+                        <option value="">-- เลือกวันที่ทำแบบทดสอบ --</option>
+                    </select>
+                </div>
+
+                <div id="questionsContainer" class="space-y-6 mt-4">
+                    <div class="text-center text-gray-500 py-8">กรุณาเลือกวันที่เพื่อแสดงข้อสอบ</div>
+                </div>
+
+                <button id="submitBtn" onclick="submitTest()" class="hidden w-full bg-green-500 hover:bg-green-600 text-white font-semibold py-3.5 px-6 rounded-lg shadow-md hover:shadow-lg transition-all text-lg mt-8">
+                    ส่งคำตอบและดูผลคะแนน
+                </button>
+            </div>
+
+            <!-- Result Section -->
+            <div id="resultSection" class="hidden mt-8 text-center bg-purple-50 rounded-xl p-6 border border-purple-100">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-purple-100 text-purple-600 rounded-full mb-4">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">ส่งคำตอบสำเร็จ!</h3>
+                <p id="finalScore" class="text-xl text-purple-700 font-semibold mb-4"></p>
+                <button onclick="location.reload()" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-6 rounded-lg transition-colors">
+                    กลับไปหน้าแรก
+                </button>
+            </div>
+
+            <!-- Admin Section -->
+            <div id="adminSection" class="hidden space-y-5 border-t-2 border-dashed border-gray-200 pt-6 mt-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-bold text-purple-800 flex items-center">
+                        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        ระบบจัดการข้อสอบ (แอดมิน)
+                    </h2>
+                    <button onclick="closeAdmin()" class="text-gray-500 hover:text-red-500 bg-gray-100 hover:bg-red-50 px-3 py-1 rounded">ปิด</button>
+                </div>
+                
+                <div class="bg-purple-50 p-5 rounded-xl border border-purple-200">
+                    <h3 class="font-semibold text-purple-700 mb-3 border-b border-purple-200 pb-2">➕ เพิ่มข้อสอบใหม่</h3>
+                    <div class="grid grid-cols-1 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">วันที่ของข้อสอบ</label>
+                            <input type="text" id="adminDate" readonly class="w-full border border-gray-300 rounded-lg px-4 py-2 bg-gray-200 text-gray-600 cursor-not-allowed">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">โจทย์คำถาม <span class="text-red-500">*</span></label>
+                            <textarea id="adminQ" rows="2" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-purple-500"></textarea>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">ตัวเลือก 1</label>
+                                <input type="text" id="adminO1" class="w-full border border-gray-300 rounded-lg px-3 py-1.5 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">ตัวเลือก 2</label>
+                                <input type="text" id="adminO2" class="w-full border border-gray-300 rounded-lg px-3 py-1.5 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">ตัวเลือก 3</label>
+                                <input type="text" id="adminO3" class="w-full border border-gray-300 rounded-lg px-3 py-1.5 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">ตัวเลือก 4</label>
+                                <input type="text" id="adminO4" class="w-full border border-gray-300 rounded-lg px-3 py-1.5 text-sm">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">เฉลย (ข้อที่ถูกต้อง) <span class="text-red-500">*</span></label>
+                            <select id="adminA" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-purple-500">
+                                <option value="1">ตัวเลือกที่ 1</option>
+                                <option value="2">ตัวเลือกที่ 2</option>
+                                <option value="3">ตัวเลือกที่ 3</option>
+                                <option value="4">ตัวเลือกที่ 4</option>
+                            </select>
+                        </div>
+                        <button onclick="saveAdminQuestion()" id="saveAdminBtn" class="bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-lg font-medium transition mt-2 flex justify-center items-center">
+                            บันทึกข้อสอบลงระบบ
+                        </button>
+                    </div>
+                </div>
+
+                <div class="mt-6">
+                    <h3 class="font-semibold text-purple-700 mb-3 flex items-center">
+                        <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
+                        รายการข้อสอบในระบบ
+                    </h3>
+                    <div id="adminQuestionList" class="space-y-3 max-h-80 overflow-y-auto pr-2 bg-white p-3 rounded-lg border border-gray-200">
+                        <!-- Admin questions rendered here -->
+                        <p class="text-gray-500 text-sm text-center py-4">กำลังโหลดข้อมูล...</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        
+        // URL ของ Google Apps Script ที่อัปเดตล่าสุด
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwyv4Jzl3L2Cynz1VX8RWZLCAbfW6vxV7LuyoNNDMz4I5cnW-4Ejqp9_EUrAgYAaQLh/exec";
+
+        const locationDB = {
+            "สามเสนใน": {
+                1: "ลานจอดรถ บิ๊กซีซูเปอร์เซ็นเตอร์ สาขาสะพานควาย", 2: "ลานจอดรถ บิ๊กซีซูเปอร์เซ็นเตอร์ สาขาสะพานควาย", 3: "ลานจอดรถ บิ๊กซีซูเปอร์เซ็นเตอร์ สาขาสะพานควาย", 4: "ลานจอดรถ บิ๊กซีซูเปอร์เซ็นเตอร์ สาขาสะพานควาย", 5: "ลานจอดรถ บิ๊กซีซูเปอร์เซ็นเตอร์ สาขาสะพานควาย", 6: "ลานจอดรถ บิ๊กซีซูเปอร์เซ็นเตอร์ สาขาสะพานควาย", 7: "ลานจอดรถ บิ๊กซีซูเปอร์เซ็นเตอร์ สาขาสะพานควาย",
+                8: "เต็นท์บริเวณหน้าร้าน ตำยี่สิบ ปากซอยอินทามระ 12", 9: "เต็นท์บริเวณหน้าร้าน ตำยี่สิบ ปากซอยอินทามระ 12",
+                10: "อาคารสงเคราะห์ข้าราชการและลูกจ้างประจำกรุงเทพมหานคร ซอยอินทามระ 23", 11: "อาคารสงเคราะห์ข้าราชการและลูกจ้างประจำกรุงเทพมหานคร ซอยอินทามระ 23", 12: "อาคารสงเคราะห์ข้าราชการและลูกจ้างประจำกรุงเทพมหานคร ซอยอินทามระ 23", 13: "อาคารสงเคราะห์ข้าราชการและลูกจ้างประจำกรุงเทพมหานคร ซอยอินทามระ 23",
+                14: "เต็นท์หน้าอาคารแฟมมิลี่ทาวน์ ซอยอินทามระ 29 แยก 1", 15: "เต็นท์หน้าอาคารแฟมมิลี่ทาวน์ ซอยอินทามระ 29 แยก 1",
+                16: "อาคารโรงอาหารธนาคารออมสิน สำนักงานใหญ่",
+                17: "โรงเรียนรุจิเสรีวิทยา ซอยศุภราช", 18: "โรงเรียนรุจิเสรีวิทยา ซอยศุภราช", 19: "โรงเรียนรุจิเสรีวิทยา ซอยศุภราช", 20: "โรงเรียนรุจิเสรีวิทยา ซอยศุภราช", 21: "โรงเรียนรุจิเสรีวิทยา ซอยศุภราช",
+                22: "สำนักงานคณะกรรมการกิจการกระจายเสียง กิจการโทรทัศน์และกิจการโทรคมนาคมแห่งชาติ ซอยพหลโยธิน 8", 23: "สำนักงานคณะกรรมการกิจการกระจายเสียง กิจการโทรทัศน์และกิจการโทรคมนาคมแห่งชาติ ซอยพหลโยธิน 8", 24: "สำนักงานคณะกรรมการกิจการกระจายเสียง กิจการโทรทัศน์และกิจการโทรคมนาคมแห่งชาติ ซอยพหลโยธิน 8", 25: "สำนักงานคณะกรรมการกิจการกระจายเสียง กิจการโทรทัศน์และกิจการโทรคมนาคมแห่งชาติ ซอยพหลโยธิน 8",
+                26: "แฟลตเฉลิมลาภ 3", 27: "แฟลตเฉลิมลาภ 3",
+                28: "เต็นท์บริเวณลานจอดรถสำนักป้องกันและบรรเทาสาธารณภัย", 29: "เต็นท์บริเวณลานจอดรถสำนักป้องกันและบรรเทาสาธารณภัย", 30: "เต็นท์บริเวณลานจอดรถสำนักป้องกันและบรรเทาสาธารณภัย",
+                31: "เต็นท์หน้าศูนย์การค้ามาเก็ตเพลส ลาวิลล่า อารีย์", 32: "เต็นท์หน้าศูนย์การค้ามาเก็ตเพลส ลาวิลล่า อารีย์",
+                33: "เต็นท์ใต้ทางด่วนปากซอยราชวิถี 4 (ซอยพระนาง)", 34: "เต็นท์ใต้ทางด่วนปากซอยราชวิถี 4 (ซอยพระนาง)",
+                35: "เต็นท์สำนักงานคณะกรรมการป้องกันและปราบปรามยาเสพติด (ปปส.)", 36: "เต็นท์สำนักงานคณะกรรมการป้องกันและปราบปรามยาเสพติด (ปปส.)",
+                37: "สมาคมคนตาบอดแห่งประเทศไทย ซอยบุญอยู่",
+                38: "เต็นท์นิติบุคคลอาคารชุด มิว ถนนวิภาวดีรังสิต"
+            },
+            "พญาไท": {
+                1: "เต็นท์บริเวณลานกิจกรรมโรงเรียนวัดไผ่ตัน", 2: "เต็นท์บริเวณลานกิจกรรมโรงเรียนวัดไผ่ตัน",
+                3: "โรงจอดรถที่ทำการไปรษณีย์สามเสนใน",
+                4: "อาคารเดอะไรซ์ ทาวเวอร์ สะพานควาย", 5: "อาคารเดอะไรซ์ ทาวเวอร์ สะพานควาย", 6: "อาคารเดอะไรซ์ ทาวเวอร์ สะพานควาย", 7: "อาคารเดอะไรซ์ ทาวเวอร์ สะพานควาย",
+                8: "เต็นท์ศูนย์พัฒนาเด็กก่อนวัยเรียนชุมชนวัดไผ่ตัน ซอยประดิพัทธ์ 19", 9: "เต็นท์ศูนย์พัฒนาเด็กก่อนวัยเรียนชุมชนวัดไผ่ตัน ซอยประดิพัทธ์ 19",
+                10: "ศูนย์บริการสาธารณสุข 11 ประดิพัทธ์",
+                11: "เต็นท์ใต้ทางด่วน ซอยประดิพัทธ์ 5 (เรวดีเหนือ)",
+                12: "เต็นท์บริเวณลานชุมชนประดิพัทธ์ 1 (อาเซียน) ริมถนนกำแพงเพชร 5", 13: "เต็นท์บริเวณลานชุมชนประดิพัทธ์ 1 (อาเซียน) ริมถนนกำแพงเพชร 5",
+                14: "เต็นท์ศูนย์บริการและจำหน่ายรถยนต์ วิสเปอร์ คาร์",
+                15: "อาคารลานอเนกประสงค์กรมประชาสัมพันธ์", 16: "อาคารลานอเนกประสงค์กรมประชาสัมพันธ์", 17: "อาคารลานอเนกประสงค์กรมประชาสัมพันธ์", 18: "อาคารลานอเนกประสงค์กรมประชาสัมพันธ์", 19: "อาคารลานอเนกประสงค์กรมประชาสัมพันธ์", 20: "อาคารลานอเนกประสงค์กรมประชาสัมพันธ์", 21: "อาคารลานอเนกประสงค์กรมประชาสัมพันธ์", 22: "อาคารลานอเนกประสงค์กรมประชาสัมพันธ์", 23: "อาคารลานอเนกประสงค์กรมประชาสัมพันธ์", 24: "อาคารลานอเนกประสงค์กรมประชาสัมพันธ์",
+                25: "โรงเรียนอนุบาลสามเสน", 26: "เต็นท์โรงเรียนอนุบาลสามเสน",
+                27: "โรงเรียนสามเสนวิทยาลัย", 28: "โรงเรียนสามเสนวิทยาลัย",
+                29: "อาคารตรงข้ามสถานีรถไฟสามเสน",
+                30: "เต็นท์อาคารบ้านยสวดี ซอยอารีย์",
+                31: "กองบัญชาการตำรวจตระเวนชายแดน",
+                32: "โรงพยาบาลประสานมิตร",
+                33: "เต็นท์หน้าโรงอาหารธนาคารเพื่อการส่งออกและนำเข้าแห่งประเทศไทย (Exim Bank)",
+                34: "เต็นท์ใต้ทางด่วนสวนพญาไทภิรมย์", 35: "เต็นท์ใต้ทางด่วนสวนพญาไทภิรมย์", 36: "เต็นท์ใต้ทางด่วนสวนพญาไทภิรมย์", 37: "เต็นท์ใต้ทางด่วนสวนพญาไทภิรมย์",
+                38: "แฟลตลือชา 9", 39: "แฟลตลือชา 6", 40: "แฟลตลือชา 15",
+                41: "เต็นท์บริเวณ เดอะ ซีซันส์ มอลล์ สนามเป้า", 42: "เต็นท์บริเวณ เดอะ ซีซันส์ มอลล์ สนามเป้า"
+            }
+        };
+
+        // ฐานข้อมูลเริ่มต้น (จะถูกเขียนทับถ้าโหลดจาก Google Sheet สำเร็จ)
+        let questionDatabase = [];
+        let currentQuestions = [];
+        let userCompletedDates = [];
+        let completedTestsHistory = []; // เก็บประวัติ {date, score, total, answers}
+        let isSubmitted = false;
+        
+        window.updateUnits = updateUnits;
+        window.updateLocation = updateLocation;
+        window.checkUserScore = checkUserScore;
+        window.startTest = startTest;
+        window.loadQuestionsForDate = loadQuestionsForDate;
+        window.submitTest = submitTest;
+        window.checkAdmin = checkAdmin;
+        window.closeAdmin = closeAdmin;
+        window.saveAdminQuestion = saveAdminQuestion;
+        window.deleteQuestionAdmin = deleteQuestionAdmin;
+
+        // ดึงข้อสอบทั้งหมดจากฐานข้อมูลเมื่อโหลดหน้าเว็บ
+        window.onload = () => {
+            const loading = document.getElementById("globalLoading");
+            loading.classList.remove("hidden");
+            // เพิ่ม &t=... เพื่อป้องกันการจำค่าเดิม (Cache) ของเบราว์เซอร์
+            fetch(`${GOOGLE_SCRIPT_URL}?action=getQuestions&t=${new Date().getTime()}`)
+            .then(res => res.json())
+            .then(data => {
+                loading.classList.add("hidden");
+                if(data.status === "success" && data.data.length > 0) {
+                    questionDatabase = data.data;
+                } else if(data.data.length === 0) {
+                    // ถ้ายังไม่มีข้อสอบเลยในระบบ
+                    questionDatabase = [];
+                }
+            }).catch(e => {
+                loading.classList.add("hidden");
+                console.log("Offline mode or error fetching questions.");
+            });
+        };
+
+        function showAlert(msg, isError = true) {
+            const box = document.getElementById('alertBox');
+            box.innerHTML = msg;
+            box.className = `mb-6 p-4 rounded-lg text-sm font-medium transition-all block ${isError ? 'bg-red-100 text-red-700 border border-red-300' : 'bg-green-100 text-green-700 border border-green-300'}`;
+            box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setTimeout(() => { box.classList.add('hidden'); }, 5000);
+        }
+
+        function updateUnits() {
+            const subDistrict = document.getElementById("subDistrict").value;
+            const unitSelect = document.getElementById("unitNumber");
+            const locationDisplay = document.getElementById("locationDisplay");
+            
+            unitSelect.innerHTML = '<option value="">-- เลือกหน่วย --</option>';
+            locationDisplay.innerHTML = "(สถานที่ตั้งหน่วยจะแสดงอัตโนมัติ)";
+            locationDisplay.classList.remove("font-semibold", "text-purple-700");
+            
+            if (subDistrict && locationDB[subDistrict]) {
+                unitSelect.disabled = false;
+                unitSelect.classList.remove("bg-gray-50");
+                unitSelect.classList.add("bg-white");
+                
+                const units = Object.keys(locationDB[subDistrict]);
+                units.forEach(u => {
+                    const option = document.createElement("option");
+                    option.value = u;
+                    option.textContent = `หน่วยที่ ${u}`;
+                    unitSelect.appendChild(option);
+                });
+            } else {
+                unitSelect.disabled = true;
+                unitSelect.classList.add("bg-gray-50");
+                unitSelect.classList.remove("bg-white");
+                unitSelect.innerHTML = '<option value="">-- กรุณาเลือกแขวงก่อน --</option>';
+            }
+        }
+
+        function updateLocation() {
+            const subDistrict = document.getElementById("subDistrict").value;
+            const unit = document.getElementById("unitNumber").value;
+            const locationDisplay = document.getElementById("locationDisplay");
+            
+            if (subDistrict && unit && locationDB[subDistrict][unit]) {
+                locationDisplay.innerHTML = `📍 ${locationDB[subDistrict][unit]}`;
+                locationDisplay.classList.add("font-semibold", "text-purple-700");
+            } else {
+                locationDisplay.innerHTML = "(สถานที่ตั้งหน่วยจะแสดงอัตโนมัติ)";
+                locationDisplay.classList.remove("font-semibold", "text-purple-700");
+            }
+        }
+
+        function checkUserScore() {
+            const name = document.getElementById("fullName").value.trim();
+            const loadingIcon = document.getElementById("loadingScore");
+            const scoreDisplay = document.getElementById("scoreDisplay");
+            const scoreText = document.getElementById("scoreText");
+
+            if (!name) {
+                scoreDisplay.classList.add("hidden");
+                return;
+            }
+
+            loadingIcon.classList.remove("hidden");
+            scoreDisplay.classList.add("hidden");
+
+            // เพิ่ม &t=... เพื่อดึงคะแนนล่าสุดเสมอ
+            fetch(`${GOOGLE_SCRIPT_URL}?action=getScore&name=${encodeURIComponent(name)}&t=${new Date().getTime()}`, {
+                method: 'GET',
+                redirect: 'follow'
+            })
+            .then(response => response.json())
+            .then(data => {
+                loadingIcon.classList.add("hidden");
+                scoreDisplay.classList.remove("hidden");
+                
+                if (data.status === "success") {
+                    userCompletedDates = data.completedDates || [];
+                    completedTestsHistory = data.completedTests || []; // ประวัติแบบละเอียด
+                    
+                    if(document.getElementById("quizSection").classList.contains("hidden") === false) {
+                        refreshDateDropdown();
+                    }
+                    
+                    if (data.totalQuestions > 0) {
+                        scoreText.innerHTML = `⭐ <b>ประวัติของคุณ:</b> ตอบคำถามไปแล้ว <b>${data.totalQuestions}</b> ข้อ | ตอบถูก <b>${data.totalScore}</b> คะแนน`;
+                        scoreDisplay.className = "mt-3 p-3 bg-purple-100 border border-purple-200 rounded-lg text-sm text-purple-800 flex items-center transition-all";
+                        
+                        if (data.subDistrict && data.unit) {
+                            document.getElementById("subDistrict").value = data.subDistrict;
+                            updateUnits();
+                            setTimeout(() => {
+                                document.getElementById("unitNumber").value = data.unit;
+                                updateLocation();
+                            }, 50);
+                        }
+                    } else {
+                        scoreText.innerHTML = `👋 ยินดีต้อนรับ! คุณยังไม่มีประวัติการทำแบบทดสอบ`;
+                        scoreDisplay.className = "mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800 flex items-center transition-all";
+                    }
+                } else {
+                    scoreText.innerHTML = `⚠️ ไม่สามารถดึงประวัติได้ (${data.message})`;
+                    scoreDisplay.className = "mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-800 transition-all";
+                }
+            })
+            .catch(error => {
+                loadingIcon.classList.add("hidden");
+                scoreDisplay.classList.remove("hidden");
+                scoreText.innerHTML = `⚠️ เกิดข้อผิดพลาดในการเชื่อมต่อฐานข้อมูล`;
+                scoreDisplay.className = "mt-3 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800 transition-all";
+            });
+        }
+
+        function startTest() {
+            const name = document.getElementById("fullName").value.trim();
+            const subDistrict = document.getElementById("subDistrict").value;
+            const unit = document.getElementById("unitNumber").value;
+
+            if (!name || !subDistrict || !unit) {
+                showAlert("กรุณากรอกข้อมูล ชื่อ-สกุล แขวง และหน่วย ให้ครบถ้วนก่อนเริ่มทำแบบทดสอบ");
+                return;
+            }
+            if (questionDatabase.length === 0) {
+                showAlert("ยังไม่มีข้อสอบในระบบ กรุณาติดต่อผู้ดูแลระบบ");
+                return;
+            }
+
+            document.getElementById("fullName").disabled = true;
+            document.getElementById("subDistrict").disabled = true;
+            document.getElementById("unitNumber").disabled = true;
+            document.getElementById("fullName").classList.add("bg-gray-100");
+            document.getElementById("startBtn").classList.add("hidden");
+            
+            refreshDateDropdown();
+            document.getElementById("quizSection").classList.remove("hidden");
+            document.getElementById("alertBox").classList.add("hidden");
+        }
+
+        function refreshDateDropdown() {
+            const select = document.getElementById("testDate");
+            const currentVal = select.value;
+            
+            const dates = [...new Set(questionDatabase.map(q => q.date))];
+            
+            select.innerHTML = '<option value="">-- เลือกวันที่ทำแบบทดสอบ --</option>';
+            dates.forEach(d => {
+                const option = document.createElement("option");
+                option.value = d;
+                // แสดงแค่ วัน เดือน ปี ภาษาไทย เช่น "17 มิถุนายน 2569" ตามฐานข้อมูล
+                option.textContent = d; 
+                select.appendChild(option);
+            });
+            
+            if (currentVal) select.value = currentVal;
+        }
+
+        function loadQuestionsForDate() {
+            const selectedDate = document.getElementById("testDate").value;
+            const container = document.getElementById("questionsContainer");
+            const submitBtn = document.getElementById("submitBtn");
+            
+            if (!selectedDate) {
+                container.innerHTML = '<div class="text-center text-gray-500 py-8">กรุณาเลือกวันที่เพื่อแสดงข้อสอบ</div>';
+                submitBtn.classList.add("hidden");
+                return;
+            }
+
+            // เช็คว่าวันนี้เคยตอบข้อสอบไปแล้วหรือยัง
+            const isCompleted = userCompletedDates.includes(selectedDate);
+            
+            // ค้นหาประวัติการตอบจาก History
+            let pastAnswers = [];
+            if (isCompleted) {
+                let pastTest = completedTestsHistory.find(t => t.date === selectedDate);
+                if (pastTest && pastTest.answers) {
+                    try { pastAnswers = JSON.parse(pastTest.answers); } catch(e) {}
+                }
+                showAlert(`📌 คุณได้ทำแบบทดสอบนี้ไปแล้ว นี่คือผลการทำแบบทดสอบของคุณ`, false);
+            }
+
+            currentQuestions = questionDatabase.filter(q => q.date === selectedDate);
+            
+            if (currentQuestions.length === 0) {
+                container.innerHTML = '<div class="text-center text-gray-500 py-8">ไม่มีข้อมูลข้อสอบสำหรับวันนี้</div>';
+                submitBtn.classList.add("hidden");
+                return;
+            }
+
+            container.innerHTML = '';
+            isSubmitted = isCompleted;
+
+            currentQuestions.forEach((q, index) => {
+                let optionsHtml = '';
+                let userAnswerIndex = -1;
+                
+                if (isCompleted && pastAnswers.length > index) {
+                    userAnswerIndex = pastAnswers[index];
+                }
+
+                q.options.forEach((opt, optIndex) => {
+                    let isChecked = (isCompleted && userAnswerIndex === optIndex) ? "checked" : "";
+                    let disabledState = isCompleted ? "disabled" : "";
+                    let labelClass = "flex items-start p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-purple-50 transition-colors";
+
+                    // ถ้าเคยทำแล้ว ให้แสดงสีเฉลย
+                    if (isCompleted) {
+                        if (optIndex === q.ans) {
+                            labelClass = "flex items-start p-3 border-2 border-green-400 bg-green-50 rounded-lg cursor-not-allowed"; // สีเขียว = ข้อที่ถูก
+                        } else if (optIndex === userAnswerIndex && userAnswerIndex !== q.ans) {
+                            labelClass = "flex items-start p-3 border-2 border-red-400 bg-red-50 rounded-lg cursor-not-allowed"; // สีแดง = ข้อที่ผู้ใช้ตอบผิด
+                        } else {
+                            labelClass = "flex items-start p-3 border border-gray-200 bg-gray-50 rounded-lg cursor-not-allowed opacity-60";
+                        }
+                    }
+
+                    optionsHtml += `
+                        <label class="${labelClass}" id="label_q${index}_opt${optIndex}">
+                            <input type="radio" name="q${index}" value="${optIndex}" ${isChecked} ${disabledState} class="mt-1 h-4 w-4 text-purple-600 border-gray-300 focus:ring-purple-500">
+                            <span class="ml-3 text-gray-700">${opt}</span>
+                        </label>
+                    `;
+                });
+
+                let feedbackHtml = '';
+                if (isCompleted) {
+                    if (userAnswerIndex === q.ans) {
+                        feedbackHtml = `<div class="mt-4 p-3 rounded-lg text-sm bg-green-100 text-green-800 border border-green-200 font-medium">✅ คุณตอบถูก!</div>`;
+                    } else if (userAnswerIndex === -1) {
+                        feedbackHtml = `<div class="mt-4 p-3 rounded-lg text-sm bg-yellow-100 text-yellow-800 border border-yellow-200 font-medium">⚠️ คุณไม่ได้ตอบข้อนี้ (เฉลย: ${q.options[q.ans]})</div>`;
+                    } else {
+                        feedbackHtml = `<div class="mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800 border border-red-200 font-medium">❌ คุณตอบผิด (เฉลย: ${q.options[q.ans]})</div>`;
+                    }
+                }
+
+                container.innerHTML += `
+                    <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm mb-4" id="qContainer_${index}">
+                        <h3 class="font-medium text-gray-800 mb-4"><span class="text-purple-600 font-bold">ข้อ ${index + 1}.</span> ${q.q}</h3>
+                        <div class="space-y-2">
+                            ${optionsHtml}
+                        </div>
+                        <div id="feedback_${index}" class="${isCompleted ? 'block' : 'hidden'}">${feedbackHtml}</div>
+                    </div>
+                `;
+            });
+
+            // ซ่อนปุ่มส่งถ้าเป็นข้อสอบที่เคยทำแล้ว
+            if (isCompleted) {
+                submitBtn.classList.add("hidden");
+            } else {
+                submitBtn.classList.remove("hidden");
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = "ส่งคำตอบและดูผลคะแนน";
+            }
+        }
+
+        function submitTest() {
+            if (isSubmitted) return;
+
+            let score = 0;
+            let allAnswered = true;
+            let userAnswers = [];
+
+            currentQuestions.forEach((q, index) => {
+                const selected = document.querySelector(`input[name="q${index}"]:checked`);
+                if (!selected) {
+                    allAnswered = false;
+                } else {
+                    userAnswers.push(parseInt(selected.value));
+                }
+            });
+
+            if (!allAnswered) {
+                showAlert("กรุณาตอบคำถามให้ครบทุกข้อก่อนกดส่ง");
+                return;
+            }
+
+            currentQuestions.forEach((q, index) => {
+                const selectedVal = userAnswers[index];
+                const isCorrect = (selectedVal === q.ans);
+                
+                if (isCorrect) score++;
+
+                q.options.forEach((opt, optIndex) => {
+                    const label = document.getElementById(`label_q${index}_opt${optIndex}`);
+                    document.querySelector(`input[name="q${index}"][value="${optIndex}"]`).disabled = true;
+                    
+                    if (optIndex === q.ans) {
+                        label.className = "flex items-start p-3 border-2 border-green-400 bg-green-50 rounded-lg cursor-not-allowed";
+                    } else if (optIndex === selectedVal && !isCorrect) {
+                        label.className = "flex items-start p-3 border-2 border-red-400 bg-red-50 rounded-lg cursor-not-allowed";
+                    } else {
+                        label.className = "flex items-start p-3 border border-gray-200 bg-gray-50 rounded-lg cursor-not-allowed opacity-60";
+                    }
+                });
+
+                const feedback = document.getElementById(`feedback_${index}`);
+                feedback.classList.remove("hidden");
+                if (isCorrect) {
+                    feedback.className = "mt-4 p-3 rounded-lg text-sm bg-green-100 text-green-800 border border-green-200 font-medium";
+                    feedback.innerHTML = "✅ คุณตอบถูก!";
+                } else {
+                    feedback.className = "mt-4 p-3 rounded-lg text-sm bg-red-100 text-red-800 border border-red-200 font-medium";
+                    feedback.innerHTML = `❌ คุณตอบผิด (เฉลยที่ถูกต้องคือ: ${q.options[q.ans]})`;
+                }
+            });
+
+            isSubmitted = true;
+            document.getElementById("submitBtn").disabled = true;
+            document.getElementById("submitBtn").innerHTML = "กำลังบันทึกข้อมูล...";
+
+            const name = document.getElementById("fullName").value;
+            const subDistrict = document.getElementById("subDistrict").value;
+            const unit = document.getElementById("unitNumber").value;
+            const locationStr = locationDB[subDistrict][unit];
+            const testDate = document.getElementById("testDate").value;
+
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({
+                    action: "saveUser",
+                    name: name,
+                    subDistrict: subDistrict,
+                    unit: unit,
+                    location: locationStr,
+                    testDate: testDate,
+                    score: score,
+                    total: currentQuestions.length,
+                    userAnswers: userAnswers // ส่งประวัติการเลือกกลับไปเซฟด้วย
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById("submitBtn").classList.add("hidden");
+                document.getElementById("resultSection").classList.remove("hidden");
+                document.getElementById("finalScore").innerHTML = `คุณทำคะแนนได้ ${score} / ${currentQuestions.length} คะแนน`;
+                document.getElementById("alertBox").classList.add("hidden");
+                
+                if (!userCompletedDates.includes(testDate)) {
+                    userCompletedDates.push(testDate);
+                    completedTestsHistory.push({ date: testDate, score: score, total: currentQuestions.length, answers: JSON.stringify(userAnswers) });
+                }
+                refreshDateDropdown();
+            })
+            .catch(error => {
+                showAlert("บันทึกข้อมูลสำเร็จ แต่เกิดปัญหากับการเชื่อมต่ออินเทอร์เน็ต", false);
+                document.getElementById("submitBtn").classList.add("hidden");
+                document.getElementById("resultSection").classList.remove("hidden");
+                document.getElementById("finalScore").innerHTML = `คุณทำคะแนนได้ ${score} / ${currentQuestions.length} คะแนน`;
+            });
+        }
+
+        // --- Admin Functions ---
+        function checkAdmin() {
+            const pwd = prompt("กรุณาใส่รหัสผ่านสำหรับแอดมิน:");
+            if (pwd === "8888") {
+                document.getElementById("adminSection").classList.remove("hidden");
+                // ซ่อนหน้าจอของผู้ใช้ทั่วไปเมื่อเข้าโหมดแอดมิน
+                document.getElementById("preTestSection").classList.add("hidden");
+                document.getElementById("quizSection").classList.add("hidden");
+                document.getElementById("resultSection").classList.add("hidden");
+                
+                const today = new Date();
+                const thaiMonths = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+                const dateStr = `${today.getDate()} ${thaiMonths[today.getMonth()]} ${today.getFullYear() + 543}`;
+                document.getElementById("adminDate").value = dateStr;
+                loadAdminQuestions(); // ดึงรายการคำถามมาโชว์ในกล่องแอดมิน
+            } else if (pwd !== null) {
+                alert("รหัสผ่านไม่ถูกต้อง");
+            }
+        }
+
+        function closeAdmin() {
+            document.getElementById("adminSection").classList.add("hidden");
+            // แสดงหน้าจอของผู้ใช้ทั่วไปกลับมา
+            document.getElementById("preTestSection").classList.remove("hidden");
+            
+            // ตรวจสอบว่าก่อนกดเข้าแอดมิน ผู้ใช้อยู่ในหน้าทำข้อสอบ หรือ หน้าผลคะแนน
+            if (document.getElementById("startBtn").classList.contains("hidden")) {
+                if (isSubmitted) {
+                    document.getElementById("resultSection").classList.remove("hidden");
+                } else {
+                    document.getElementById("quizSection").classList.remove("hidden");
+                }
+            }
+        }
+
+        function loadAdminQuestions() {
+            const list = document.getElementById("adminQuestionList");
+            list.innerHTML = '<p class="text-gray-500 text-sm text-center py-4"><span class="loader inline-block align-middle mr-2"></span> กำลังโหลดข้อสอบ...</p>';
+            
+            // เพิ่ม &t=... เพื่อดึงรายการข้อสอบล่าสุดเสมอหลังจากเพิ่งเพิ่ม/ลบ
+            fetch(`${GOOGLE_SCRIPT_URL}?action=getQuestions&t=${new Date().getTime()}`)
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === "success") {
+                    questionDatabase = data.data; 
+                    if(document.getElementById("quizSection").classList.contains("hidden") === false) {
+                        refreshDateDropdown();
+                    }
+                    list.innerHTML = '';
+                    if(data.data.length === 0) {
+                        list.innerHTML = '<p class="text-gray-500 text-sm text-center py-4">ยังไม่มีข้อสอบในระบบ</p>';
+                        return;
+                    }
+                    data.data.forEach(q => {
+                        list.innerHTML += `
+                            <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-gray-50 p-3 rounded border border-gray-200">
+                                <div class="mb-2 md:mb-0">
+                                    <span class="text-xs font-bold text-purple-600 bg-purple-100 px-2 py-1 rounded-full">${q.date}</span>
+                                    <p class="text-sm text-gray-800 mt-2 font-medium">${q.q}</p>
+                                </div>
+                                <button onclick="deleteQuestionAdmin('${q.date}', '${q.q.replace(/'/g, "\\'")}', this)" class="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-2 rounded-md transition-colors whitespace-nowrap shadow-sm">
+                                    ลบข้อสอบ
+                                </button>
+                            </div>
+                        `;
+                    });
+                }
+            });
+        }
+
+        function deleteQuestionAdmin(date, q, btn) {
+            if(!confirm("⚠️ คุณต้องการลบข้อสอบนี้ใช่หรือไม่? (การกระทำนี้ไม่สามารถย้อนกลับได้)")) return;
+            
+            const originalText = btn.innerHTML;
+            btn.innerHTML = "กำลังลบ...";
+            btn.disabled = true;
+            btn.classList.add("opacity-50");
+
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({ action: "deleteQuestion", date: date, question: q })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === "success"){
+                    btn.parentElement.remove();
+                    questionDatabase = questionDatabase.filter(item => !(item.date === date && item.q === q));
+                    if(document.getElementById("quizSection").classList.contains("hidden") === false) {
+                        refreshDateDropdown();
+                    }
+                    alert("ลบข้อสอบสำเร็จ");
+                } else {
+                    alert("ลบไม่สำเร็จ: " + data.message);
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    btn.classList.remove("opacity-50");
+                }
+            })
+            .catch(err => {
+                alert("เกิดข้อผิดพลาดในการเชื่อมต่อเครือข่าย");
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                btn.classList.remove("opacity-50");
+            });
+        }
+
+        function saveAdminQuestion() {
+            const date = document.getElementById("adminDate").value;
+            const q = document.getElementById("adminQ").value.trim();
+            const o1 = document.getElementById("adminO1").value.trim();
+            const o2 = document.getElementById("adminO2").value.trim();
+            const o3 = document.getElementById("adminO3").value.trim();
+            const o4 = document.getElementById("adminO4").value.trim();
+            const a = parseInt(document.getElementById("adminA").value) - 1;
+
+            if (!q || !o1 || !o2 || !o3 || !o4) {
+                alert("กรุณากรอกคำถามและตัวเลือกให้ครบทั้ง 4 ตัวเลือก");
+                return;
+            }
+
+            const btn = document.getElementById("saveAdminBtn");
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<span class="loader mr-2 !w-4 !h-4 !border-2"></span> กำลังบันทึก...`;
+            btn.disabled = true;
+
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: "POST",
+                headers: { "Content-Type": "text/plain;charset=utf-8" },
+                body: JSON.stringify({
+                    action: "saveQuestion",
+                    date: date,
+                    question: q,
+                    opt1: o1,
+                    opt2: o2,
+                    opt3: o3,
+                    opt4: o4,
+                    answer: a
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                if(data.status === "success") {
+                    alert("บันทึกคำถามลงในระบบสำเร็จ!");
+                    document.getElementById("adminQ").value = "";
+                    document.getElementById("adminO1").value = "";
+                    document.getElementById("adminO2").value = "";
+                    document.getElementById("adminO3").value = "";
+                    document.getElementById("adminO4").value = "";
+                    loadAdminQuestions(); // โหลดรายการข้อสอบใหม่
+                } else {
+                    alert("เกิดข้อผิดพลาด: " + data.message);
+                }
+            })
+            .catch(error => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                alert("เกิดข้อผิดพลาดในการเชื่อมต่อเครือข่าย");
+            });
+        }
+    </script>
+</body>
+</html>
